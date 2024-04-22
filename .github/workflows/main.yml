@@ -6,8 +6,8 @@ on:
     branches: [ master ]
 
 env:
-  ECR_REPOSITORY: flask-app
-  EKS_CLUSTER_NAME: Kubernetes-demo 
+  ECR_REPOSITORY: steve-flask-app
+  EKS_CLUSTER_NAME: demo-cluster
   AWS_REGION: us-east-1
 
 jobs:
@@ -37,12 +37,12 @@ jobs:
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
       
- - name: Build, tag, and push image to Amazon ECR
+    - name: Build, tag, and push image to Amazon ECR
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}        
         IMAGE_TAG: ${{ steps.commit.outputs.short }}
       run: |
-        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f docker/Dockerfile .
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f Dockerfile .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
     - name: Update kube config
@@ -53,7 +53,7 @@ jobs:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}        
         IMAGE_TAG: ${{ steps.commit.outputs.short }}
       run: |
-        sed -i.bak "s|DOCKER_IMAGE|$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG|g" manifests/hello-app-deployment.yaml && \
-        kubectl apply -f manifests/hello-app-deployment.yaml
-        kubectl apply -f manifests/hello-app-service.yaml
+        sed -i.bak "s|DOCKER_IMAGE|$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG|g" manifests/deployment.yaml && \
+        kubectl apply -f manifests/deployment.yaml
+        kubectl apply -f manifests/service.yaml
 
