@@ -19,6 +19,6 @@ spec:
     spec:
       containers:
       - name: sample
-        image: sclane68/githubactions:latest
+        image: DOCKER_IMAGE
         imagePullPolicy: Always
         ports:
