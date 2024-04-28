@@ -3,6 +3,7 @@ pipeline {
     agent any
 
     environment {
+        AWS_CLUSTER_NAME = "demo-cluster"
         AWS_ACCOUNT_ID = "868171460502"
         AWS_DEFAULT_REGION = "eu-west-2"
         IMAGE_REPO_NAME = "steve-repo"
@@ -14,7 +15,6 @@ pipeline {
      stage('Cloning Git') {
             steps {
                 checkout scm
-                //checkout([$class: 'GitSCM', branches: [[name: '*/main']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: '', url: 'your github url']]])     
             }
         }
 
@@ -51,5 +51,13 @@ pipeline {
             }
             }
         }
+
+        stage('Deploy'){
+            steps {
+                    sh 'aws eks update-kubeconfig  -name  ${AWS_CLUSTER_NAME}  -region ${AWS_DEFAULT_REGION}'
+                    sh 'kubectl apply -f manifest/deployment.yml'
+                    sh 'kubectl apply -f manifest/service.yml'
+            }
+     }
     }
 }
