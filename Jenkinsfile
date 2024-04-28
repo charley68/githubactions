@@ -54,7 +54,7 @@ pipeline {
 
         stage('Deploy'){
             steps {
-                    sh 'aws eks update-kubeconfig  -name  ${AWS_CLUSTER_NAME}  -region ${AWS_DEFAULT_REGION}'
+                    sh 'aws eks update-kubeconfig  --name  ${AWS_CLUSTER_NAME}  --region ${AWS_DEFAULT_REGION}'
                     sh 'kubectl apply -f manifest/deployment.yml'
                     sh 'kubectl apply -f manifest/service.yml'
             }
